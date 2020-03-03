@@ -2,6 +2,7 @@ import time
 import requests
 import neopixel
 from neopixel import *
+from datetime import datetime # To determine if it is nighttime
 
 def hex_convert(x): # take a number x as a string and convert into RGB codes
 	x = x.lstrip("#")
@@ -30,13 +31,40 @@ all_content = str(r.text) # Parse page content to find appropriate data
 start_index = all_content.find("The current setting")
 user_setting = all_content[start_index:]
 
-if "color" in user_setting:
+if "#" in user_setting:
 	color_index =  user_setting.index("#") # This block gets color into usable format
 	color_string = user_setting[color_index:color_index+7]
 	rgb_color = hex_convert(color_string)
 	set_color(strip, Color(rgb_color[1], rgb_color[0], rgb_color[2]))
 
 elif "temperature" in user_setting:
+	""" Note the following weather-states:
+			Rain: 5xx
+			Snow: 6xx
+			Clear: 800 (will be used as sunny)
+		        Cloudy 803, 804 (greater than 50% coverage)
+	    more at openweathermap.org/weather-conditions
+	"""
 	#TODO weather states
-	print("not ready yet")
+	temp_string_start = user_setting.find("The temperature is:")
+	temp_string = user_setting[temp_string_start+19: temp_string_start+23]
+	temp = float(temp_string) # Example temperature "23.4"
+	"""
+	Current order of prescedence, night before rain before cloudy before sunny
+	"""
+	if sunny:
+		if temp > 70.0:
+			set_color(strip, Color(218,143,0)) # Yellowish
+		else:
+			set_color(strip, Color(0,0,255))
+	elif cloudy:
+		set_color(strip, Color(210,192,255)) # Light violet
+	elif rainy:
+		set_color(strip, Color(26,215,255)) # Light blue
+	elif night: # Must be nighttime
+		if temp > 70.0:
+			set_color(strip, Color(240,143,0)) # Darkish orange
+		else:
+			set_color(strip, Color(0,99,150)) # Dark blue
+
 
