@@ -45,13 +45,30 @@ elif "temperature" in user_setting:
 		        Cloudy 803, 804 (greater than 50% coverage)
 	    more at openweathermap.org/weather-conditions
 	"""
-	#TODO weather states
-	temp_string_start = user_setting.find("The temperature is:")
-	temp_string = user_setting[temp_string_start+19: temp_string_start+23]
+
+	r = requests.get("http://cloudpi-1/weather_data.txt") # Need new request object for efficient parsing
+	all_content = str(r.text)
+
+	temp_string_start = all_content.find("The temperature is:")
+	temp_string = all_content[temp_string_start+19: temp_string_start+23] # go to end of first line
 	temp = float(temp_string) # Example temperature "23.4"
-	"""
-	Current order of prescedence, night before rain before cloudy before sunny
-	"""
+	print(temp)
+
+	weather_code_start = all_content.find("Code:")
+	weather_code = str(all_content[weather_code_start+5: weather_code_start+8])
+	print(weather_code)
+
+	sunset_start = all_content.find("Sunset:")
+	sunset_string = all_content[sunset_start+7:]
+	sunset_string = sunset_string[:-4]
+	print(sunset_string)
+
+	# Convert weather data above into boolean values
+	# Current order of prescedence, night before rain before cloudy before sunny
+	night =  datetime.now() > datetime.strptime(sunset_string, '%y%m%d %H:%M:%S')
+	sunny = weather_code.equals("800")
+	cloudy = weather_code.equals("803") or code.equals("804")
+	rainy = weather_code.substring(0,1).equals("5")
 	if sunny:
 		if temp > 70.0:
 			set_color(strip, Color(218,143,0)) # Yellowish
