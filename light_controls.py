@@ -64,24 +64,33 @@ elif "temperature" in user_setting:
 	print(sunset_string)
 
 	# Convert weather data above into boolean values
-	# Current order of prescedence, night before rain before cloudy before sunny
-	night =  datetime.now() > datetime.strptime(sunset_string, '%y%m%d %H:%M:%S')
-	sunny = weather_code.equals("800")
-	cloudy = weather_code.equals("803") or code.equals("804")
-	rainy = weather_code.substring(0,1).equals("5")
-	if sunny:
-		if temp > 70.0:
-			set_color(strip, Color(218,143,0)) # Yellowish
-		else:
-			set_color(strip, Color(0,0,255))
-	elif cloudy:
-		set_color(strip, Color(210,192,255)) # Light violet
-	elif rainy:
-		set_color(strip, Color(26,215,255)) # Light blue
-	elif night: # Must be nighttime
-		if temp > 70.0:
-			set_color(strip, Color(240,143,0)) # Darkish orange
-		else:
-			set_color(strip, Color(0,99,150)) # Dark blue
+	# Current order of prescedence, night before rain before cloudy or sunny
+	# night =  datetime.now() > datetime.strptime(sunset_string, '%y%m%d %H:%M:%S')
+	
+	night = False #TODO!!!!!!!
 
-
+	if not night:
+		sunny = "800" in weather_code or "801" in weather_code or "802" in weather_code
+		cloudy = "803" in weather_code or "804" in weather_code
+		rainy = weather_code[0:1] is "5"
+		if sunny:
+			if temp > 70.0:
+				set_color(strip, Color(218,143,0)) # Yellowish
+			else:
+				set_color(strip, Color(0,0,255))
+			print("sunny")
+		elif cloudy:
+			set_color(strip, Color(210,192,255)) # Light violet
+			print("cloudy")
+		elif rainy:
+			set_color(strip, Color(6,95,255)) # Light blue
+			print("rainy")
+		elif night: # Must be nighttime
+			if temp > 70.0:
+				set_color(strip, Color(240,143,0)) # Darkish orange
+			else:
+				set_color(strip, Color(0,99,150)) # Dark blue
+			print("night")
+		else:
+			# Keep last color, don't change
+			print("else")
