@@ -75,19 +75,19 @@ elif "temperature" in user_setting:
 		rainy = weather_code[0:1] is "5"
 		if sunny:
 			if temp > 70.0:
-				set_color(strip, Color(218,143,0)) # Yellowish
+				set_color(strip, Color(254,166,1)) # Yellowish
 			else:
-				set_color(strip, Color(0,0,255))
+				set_color(strip, Color(250,241,69))
 			print("sunny")
 		elif cloudy:
-			set_color(strip, Color(210,192,255)) # Light violet
+			set_color(strip, Color(210,192,222)) # Light violet
 			print("cloudy")
 		elif rainy:
-			set_color(strip, Color(6,95,255)) # Light blue
+			set_color(strip, Color(26,215,229)) # Light blue
 			print("rainy")
 		elif night: # Must be nighttime
 			if temp > 70.0:
-				set_color(strip, Color(240,143,0)) # Darkish orange
+				set_color(strip, Color(218,143,0)) # Darkish orange
 			else:
 				set_color(strip, Color(0,99,150)) # Dark blue
 			print("night")
