@@ -28,7 +28,7 @@ def is_night(sunset_hour, sunset_minute, now_hour, now_minute):
 				return True
 			else:
 				return False
-	elif (sunset_hour-now_hour) >=20:
+	elif (sunset_hour-now_hour) >=17:
 		return True
 	else:
 		return False
