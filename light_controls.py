@@ -13,6 +13,26 @@ def set_color(strip, color,wait_ms=50): # Call this function to write color out
 		strip.setPixelColor(i, color)
 		strip.show()
 
+def parse_time(str): # Takes hour or minute out of string with length 2
+	if str[0] is "0":
+		return int(str[1])
+	else:
+		return int(str)
+
+def is_night(sunset_hour, sunset_minute, now_hour, now_minute):
+	if 8>=(now_hour-sunset_hour)>=0:
+		if now_hour != sunset_hour:
+			return True
+		else:
+			if now_minute >= sunset_minute:
+				return True
+			else:
+				return False
+	elif (sunset_hour-now_hour) >=20:
+		return True
+	else:
+		return False
+
 LED_COUNT = 80 # Must set these constants to interact with LED strip
 LED_PIN = 18
 LED_FREQ_HZ = 800000
@@ -58,16 +78,17 @@ elif "temperature" in user_setting:
 	weather_code = str(all_content[weather_code_start+5: weather_code_start+8])
 	print(weather_code)
 
-	sunset_start = all_content.find("Sunset:")
+	sunset_start = all_content.find("Sunset:") # This is Greenwich time
 	sunset_string = all_content[sunset_start+7:]
-	sunset_string = sunset_string[:-4]
+	sunset_string = sunset_string[11:16] # only want hour and minute
+	sunset_hour = parse_time(sunset_string[0:2]) # int
+	sunset_minute = parse_time(sunset_string[3:]) # int
 	print(sunset_string)
 
-	# Convert weather data above into boolean values
-	# Current order of prescedence, night before rain before cloudy or sunny
-	# night =  datetime.now() > datetime.strptime(sunset_string, '%y%m%d %H:%M:%S')
-	
-	night = False #TODO!!!!!!!
+	# Convert to GWC time, then get current time
+	now_hour = datetime.now().hour+6 if datetime.now().hour + 6 < 24 else datetime.now().hour+6-24
+	now_minute = datetime.now().minute
+	night =  is_night(sunset_hour,sunset_minute, now_hour,now_minute) # boolean
 
 	if not night:
 		sunny = "800" in weather_code or "801" in weather_code or "802" in weather_code
@@ -85,12 +106,11 @@ elif "temperature" in user_setting:
 		elif rainy:
 			set_color(strip, Color(26,215,229)) # Light blue
 			print("rainy")
-		elif night: # Must be nighttime
-			if temp > 70.0:
-				set_color(strip, Color(218,143,0)) # Darkish orange
-			else:
-				set_color(strip, Color(0,99,150)) # Dark blue
-			print("night")
+		else: # Keep same color
+			print("Reached else statement")
+	else: # Must be nighttime
+		if temp > 70.0:
+			set_color(strip, Color(218,143,0)) # Darkish orange
 		else:
-			# Keep last color, don't change
-			print("else")
+			set_color(strip, Color(0,99,150)) # Dark blue
+			print("night")
